@@ -1,0 +1,23 @@
+apiVersion: v1
+items:
+- apiVersion: autoscaling/v1
+  kind: HorizontalPodAutoscaler
+  metadata:
+    name: rsapp-scaler
+    namespace: default
+    resourceVersion: "10190106"
+    uid: a6ed4c66-70b6-4e8d-9fd8-a5ffa6d41245
+  spec:
+    maxReplicas: 3
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: ReplicaSet
+      name: rsapp
+    targetCPUUtilizationPercentage: 50
+  status:
+    currentCPUUtilizationPercentage: 0
+    currentReplicas: 1
+    desiredReplicas: 1
+    lastScaleTime: "2021-10-19T21:29:33Z"
+

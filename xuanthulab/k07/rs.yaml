@@ -1,10 +1,9 @@
-apiVersion: ear
-  pps/v1
+apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
   name: rsapp
-  replicas: 3
 spec:
+  replicas: 3
   selector:
     matchLabels:
       app: rsapp

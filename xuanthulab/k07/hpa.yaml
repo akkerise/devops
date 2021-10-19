@@ -8,8 +8,8 @@ spec:
     apiVersion: apps/v1
     kind: ReplicaSet
     name: rsapp
-  minReplicas: 10
-  maxReplicas: 20
+  minReplicas: 1
+  maxReplicas: 3
   # Thực hiện scale CPU hoạt động ở 50% so với CPU mà POD yêu cầu
   targetCPUUtilizationPercentage: 50
 
