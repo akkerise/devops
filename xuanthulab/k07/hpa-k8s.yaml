@@ -19,5 +19,4 @@ items:
     currentCPUUtilizationPercentage: 0
     currentReplicas: 1
     desiredReplicas: 1
-    lastScaleTime: "2021-10-19T21:29:33Z"
 
