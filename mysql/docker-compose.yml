@@ -1,0 +1,33 @@
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+
+  db:
+    image: mysql:5.7
+    command: --disable-partition-engine-check
+    # restart: always
+    environment:
+      MYSQL_DATABASE: common
+      MYSQL_ROOT_PASSWORD: 8888
+    ports:
+      - 3306:3306
+    volumes:
+      - ./data:/var/lib/mysql
+      # - ./config/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - common
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - common
+
+volumes:
+  data:
+networks:
+  common:
+    driver: bridge
