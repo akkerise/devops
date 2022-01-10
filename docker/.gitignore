@@ -1,0 +1,7 @@
+.idea
+
+app/public_html
+
+app/logs
+
+.env

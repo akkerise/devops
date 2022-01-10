@@ -1,0 +1,182 @@
+version: '3.8'
+services:
+
+  # PHP Service 7.4
+  # php7.4:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   image: php-74
+  #   restart: unless-stopped
+  #   tty: true
+  #   environment:
+  #     SERVICE_NAME: app7.4
+  #     SERVICE_TAGS: dev7.4
+  #   working_dir: /var/www
+  #   volumes:
+  #     - ./app:/var/www
+  #   extra_hosts:
+  #     - ${SERVICES}
+  #   networks:
+  #     - network
+
+  # Worker
+  # worker:
+  #   build:
+  #     context: .
+  #     dockerfile: worker/Dockerfile
+  #   image: worker
+  #   restart: unless-stopped
+  #   tty: true
+  #   environment:
+  #     SERVICE_NAME: worker
+  #     SERVICE_TAGS: dev
+  #   volumes:
+  #     - ./app:/var/www
+  #     - ./worker/supervisord.conf:/etc/supervisord.conf
+  #   extra_hosts:
+  #     - ${SERVICES}
+  #   networks:
+  #     - network
+
+  # crontab:
+  #   build:
+  #     context: .
+  #     dockerfile: crontab/Dockerfile
+  #   image: crontab
+  #   restart: unless-stopped
+  #   tty: true
+  #   volumes:
+  #     - ./app:/var/www
+  #   extra_hosts:
+  #     - ${SERVICES}
+  #   networks:
+  #     - network
+  #   depends_on:
+  #     - php7.4
+
+  # ___________________________________________________
+  # PHP Service 7.3
+  # php7.3:
+  #   build:
+  #     context: .
+  #     dockerfile: php7.3/Dockerfile
+  #   image: php-73
+  #   restart: unless-stopped
+  #   tty: true
+  #   environment:
+  #     SERVICE_NAME: app7.3
+  #     SERVICE_TAGS: dev7.3
+  #   working_dir: /var/www
+  #   volumes:
+  #     - ./app:/var/www
+  #   extra_hosts:
+  #     - ${SERVICES}
+  #   networks:
+  #     - network
+
+  # Worker
+  # worker7.3:
+  #   build:
+  #     context: .
+  #     dockerfile: php7.3/worker/Dockerfile
+  #   image: worker-7.3
+  #   restart: unless-stopped
+  #   tty: true
+  #   environment:
+  #     SERVICE_NAME: worker
+  #     SERVICE_TAGS: dev
+  #   volumes:
+  #     - ./app/public_html:/var/www
+  #     - ./php7.3/worker/supervisord.conf:/etc/supervisord.conf
+  #   extra_hosts:
+  #     - ${SERVICES}
+  #   networks:
+  #     - network
+
+  # crontab
+  # crontab7.3:
+  #   build:
+  #     context: .
+  #     dockerfile: php7.3/crontab/Dockerfile
+  #   image: crontab-7.3
+  #   restart: unless-stopped
+  #   tty: true
+  #   volumes:
+  #     - ./app:/var/www
+  #   extra_hosts:
+  #     - ${SERVICES}
+  #   networks:
+  #     - network
+  #   depends_on:
+  #     - php7.3
+
+  # Nginx Service
+  # nginx:
+  #   image: nginx:alpine
+  #   restart: unless-stopped
+  #   tty: true
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./app:/var/www
+  #     - ./nginx/conf.d:/etc/nginx/conf.d/
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #   networks:
+  #     - network
+  #   command: ["nginx", "-g", "daemon off;"]
+
+  # MySQL Service
+  mysql:
+    platform: linux/x86_64
+    image: mysql:5.7
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci --sql_mode=""
+    restart: unless-stopped
+    # tty: true
+    ports:
+      - "3309:3306"
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./app:/var/www
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - common
+
+  # Redis service
+  redis:
+    image: redis
+    restart: unless-stopped
+    tty: true
+    networks:
+      - common
+
+  # PHPMYADMIN
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_HOST=mysql
+      - PMA_ARBITRARY=0
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "8888:80"
+    networks:
+      - common
+
+#Docker Networks
+networks:
+  common:
+    driver: bridge
+    # ipam:
+    #   config:
+    #     - subnet: "172.29.0.0/16"
+#Volumes
+volumes:
+  dbdata:
+    driver: local
