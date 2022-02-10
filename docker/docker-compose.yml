@@ -127,18 +127,20 @@ services:
   #     - network
   #   command: ["nginx", "-g", "daemon off;"]
 
-  # MySQL Service
+  # MySQL
   mysql:
     platform: linux/x86_64
     image: mysql:5.7
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci --sql_mode=""
-    restart: unless-stopped
+    restart: always
     # tty: true
     ports:
-      - "3309:3306"
+      - "3306:3306"
     volumes:
-      - ./mysql/data:/var/lib/mysql
-      - ./app:/var/www
+      # - mysql_data:/var/lib/mysql
+      - ./mysql/mysql_data:/var/lib/mysql
+      # - ./mysql/config/my.cnf:/etc/mysql/my.cnf
+      # - ./app:/var/www
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -148,16 +150,28 @@ services:
       - common
 
   # Redis service
-  redis:
-    image: redis
-    restart: unless-stopped
-    tty: true
+  # redis:
+  #   image: redis
+  #   restart: unless-stopped
+  #   tty: true
+  #   networks:
+  #     - common
+
+  # ADMINER
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
     networks:
       - common
 
   # PHPMYADMIN
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
     environment:
       - PMA_HOST=mysql
       - PMA_ARBITRARY=0
@@ -165,19 +179,19 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     ports:
-      - "80080:80"
+      - "8008:80"
     networks:
       - common
-  db:
-    image: postgres:14.1-alpine
-    restart: always
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    ports:
-      - '5432:5432'
-    volumes: 
-      - db/data:/var/lib/postgresql/data
+  # db:
+  #   image: postgres:14.1-alpine
+  #   restart: always
+  #   environment:
+  #     - POSTGRES_USER=${POSTGRES_USER}
+  #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  #   ports:
+  #     - '5432:5432'
+  #   volumes: 
+  #     - db/data:/var/lib/postgresql/data
       # - ./postgres/config/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
 
 #Docker Networks
@@ -189,7 +203,5 @@ networks:
     #     - subnet: "172.29.0.0/16"
 #Volumes
 volumes:
-  dbdata:
-    driver: local
-  db:
+  mysql_data:
     driver: local
