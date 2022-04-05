@@ -137,8 +137,9 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      # - mysql_data:/var/lib/mysql
       - ./mysql/mysql_data:/var/lib/mysql
+      - ./mysql/mysql-init:/docker-entrypoint-initdb.d
+      # - mysql_data:/var/lib/mysql
       # - ./mysql/config/my.cnf:/etc/mysql/my.cnf
       # - ./app:/var/www
     environment:
@@ -146,23 +147,6 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    networks:
-      - common
-
-  # Redis service
-  # redis:
-  #   image: redis
-  #   restart: unless-stopped
-  #   tty: true
-  #   networks:
-  #     - common
-
-  # ADMINER
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
     networks:
       - common
 
@@ -182,6 +166,24 @@ services:
       - "8008:80"
     networks:
       - common
+
+  # Redis service
+  # redis:
+  #   image: redis
+  #   restart: unless-stopped
+  #   tty: true
+  #   networks:
+  #     - common
+
+  # ADMINER
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
+  #   networks:
+  #     - common
+  
   # db:
   #   image: postgres:14.1-alpine
   #   restart: always
